@@ -203,10 +203,9 @@ Producers SHOULD use these native FIT fields for rowing data:
 
 ### 4.1 Sessions, Laps and Intervals
 
-How a workout is divided into Session, Lap and Split messages follows the FIT activity file conventions, see the [FIT activity file documentation](https://developer.garmin.com/fit/file-types/activity/) and the [encoding cookbook](https://developer.garmin.com/fit/cookbook/encoding-activity-files/). This standard adds two rules for rowing:
+How a workout is divided into Session, Lap and Split messages follows the FIT activity file conventions, see the [FIT activity file documentation](https://developer.garmin.com/fit/file-types/activity/) and the [encoding cookbook](https://developer.garmin.com/fit/cookbook/encoding-activity-files/). This standard adds one rule for rowing:
 
-1. **Intervals are marked with intensity.** Producers SHOULD write each work and rest interval as its own Lap, and MUST set the native `intensity` field on every Lap they write (`active` for work, `rest` for rest, or another value of the FIT `intensity` enum).
-2. **Active laps add up to moving time.** Rest and pauses MUST NOT be included in a Lap with `intensity=active`, so that a consumer gets the moving time by summing `total_timer_time` over the active Laps.
+1. **Intervals are marked with intensity.** Producers SHOULD write each work and rest interval as its own Lap, and MUST set the native `intensity` field on every Lap they write (`active` for work, `rest` for rest, or another value of the FIT `intensity` enum). Laps MAY include pauses.
 
 A common convention for grouping laps into workouts and splits is expected in a later version.
 
