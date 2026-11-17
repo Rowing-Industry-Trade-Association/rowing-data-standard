@@ -7,17 +7,27 @@ from pathlib import Path
 import pytest
 from fitparse import FitFile
 
+from generate_fixtures import FIXTURE_DIR, FIXTURES
 from rowing_data import APPLICATION_ID, read_fit, write_fit
 from rowing_data.constants import RecordingStrategy
 from sample_sessions import stroke_boundary_session
 
-FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 ROWINGDATA_GOLDEN = (
     Path(__file__).resolve().parents[2]
     / "rowingdata"
     / "testdata"
     / "rowingdata_standard_example.fit"
 )
+
+
+@pytest.mark.parametrize("name", sorted(FIXTURES))
+def test_committed_fixture_matches_writer(name: str, tmp_path: Path) -> None:
+    path = tmp_path / name
+    write_fit(FIXTURES[name](), path)
+    assert path.read_bytes() == (FIXTURE_DIR / name).read_bytes(), (
+        f"tests/fixtures/{name} is stale: run `python tests/generate_fixtures.py` "
+        "from python/ and commit the result"
+    )
 
 
 def test_committed_stroke_boundary_fixture() -> None:
