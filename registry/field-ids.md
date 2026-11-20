@@ -157,7 +157,7 @@ carry the data an unaware consumer will read.
 | `cadence` | Stroke rate, integer spm | Rounded, not truncated. Always write for consumers that do not read `cadence256` |
 | `cadence256` | Stroke rate, fractional spm | Scale 256 (1/256 spm) |
 | `heart_rate` | Heart rate | bpm |
-| `power` | Average power | W |
+| `power` | Average power over the stroke cycle | W. The previous recovery and the drive that follows it, up to the finish |
 | `enhanced_speed` | Boat speed | m/s, scale 1000 |
 | `position_lat` / `position_long` | Position | Semicircles |
 | `total_cycles` | Cumulative stroke count | The stroke-detection signal; may repeat or jump by >1 |
