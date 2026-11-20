@@ -178,7 +178,7 @@ Producers SHOULD use these native FIT fields for rowing data:
 | cadence | UINT8 | Stroke rate (integer spm) | Strokes per minute, **rounded** to the nearest integer (not truncated); MUST be written when rate is known, for consumers that do not read `cadence256` |
 | cadence256 | UINT16 | Stroke rate (fractional spm) | Strokes per minute, scale 256 (1/256 spm); SHOULD be written when fractional rate is known |
 | heart_rate | UINT8 | Heart rate | Beats per minute, 0-255 |
-| power | UINT16 | Average power | Watts, 0-65535 |
+| power | UINT16 | Average power over the stroke cycle | Watts, 0-65535. See notes |
 | enhanced_speed | UINT32 | Boat speed | Meters per second (scale 1000) |
 | position_lat | SINT32 | Latitude | Semicircles |
 | position_long | SINT32 | Longitude | Semicircles |
@@ -188,6 +188,7 @@ Producers SHOULD use these native FIT fields for rowing data:
 **Notes:**
 
 - **heart_rate**: Heart rate is written in the native `heart_rate` field on the same Record messages as the rowing data, whether it comes from the rowing device or from a separate sensor. It is not repeated as a developer field. When no heart rate sensor is connected, producers SHOULD omit the field rather than write 0. Session and Lap averages and maxima go in the native `avg_heart_rate` and `max_heart_rate` fields.
+- **power**: The average power over one stroke cycle: the recovery of the previous stroke and the drive that follows it, ending at this stroke's finish. Producers SHOULD average over this whole cycle, not over the drive alone. How the power is determined, from work at the handle or from a flywheel or boat-speed model, is up to the producer.
 - **cycle_length16**: The distance the boat (or, on an ergometer, the virtual boat) travels during one stroke cycle, catch to catch. It is not the cumulative distance travelled, which is `distance`, and not the travel of the handle, which is DriveLength (§5.1).
 
 ### 4.1 Sessions, Laps and Intervals
