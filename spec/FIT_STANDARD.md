@@ -173,7 +173,7 @@ Producers SHOULD use these native FIT fields for rowing data:
 
 | FIT Field | Type | Usage | Notes |
 |-----------|------|-------|-------|
-| timestamp | UINT32 | Record timestamp | Seconds since Garmin epoch (1989-12-31 UTC) |
+| timestamp | UINT32 | Record timestamp | Seconds since Garmin epoch (1989-12-31 UTC). The milliseconds go in TimestampMs (§5.1) |
 | distance | UINT32 | Cumulative distance | Meters, scale 100 |
 | cadence | UINT8 | Stroke rate (integer spm) | Strokes per minute, **rounded** to the nearest integer (not truncated); MUST be written when rate is known, for consumers that do not read `cadence256` |
 | cadence256 | UINT16 | Stroke rate (fractional spm) | Strokes per minute, scale 256 (1/256 spm); SHOULD be written when fractional rate is known |
@@ -213,12 +213,14 @@ A common convention for grouping laps into workouts and splits is expected in a 
 | AverageBoatSpeed | 8 | UINT16 | 100 | m/s | Average boat speed during stroke | 3-6 m/s |
 | StrokeWork | 19 | UINT16 | 1 | J | Work done over full stroke cycle | 100-500 J |
 | StrokeState | 96 | UINT8 | 1 | | Phase of the stroke at record time | See StrokeState values below |
+| TimestampMs | 97 | UINT16 | 1 | ms | Milliseconds past the whole second in the record's native `timestamp` | 0-999 ms |
 
 **Notes:**
 
 - **DriveLength**: For OTW rowing, projection of handle trajectory on longitudinal axis. For indoor, handle travel catch-to-finish. Stored in **millimeters** (scale 1, units mm) for 1 mm precision. Earlier files may carry DriveLength at scale 100 in metres; see the [field ID registry](../registry/field-ids.md).
 - **AverageBoatSpeed**: Scale 100 (0.01 m/s, maximum 655.35 m/s). A scale of 1000, matching native `enhanced_speed`, is not possible: the `scale` of a FIT field description is a single byte.
 - **StrokeWork**: Energy over complete stroke cycle (not drive-only).
+- **TimestampMs**: The millisecond part of the record time, which is `timestamp` + TimestampMs / 1000 s. Producers SHOULD write it when they know the record time to better than a second. They MUST truncate the time, not round it, so that `timestamp` is never later than the true time: a record at 12:00:05.999 is written as `timestamp` 12:00:05 and TimestampMs 999, not as 12:00:06 and 0. Consumers SHOULD add it to `timestamp` when they use the record time. Values of 1000 and above are invalid, and consumers MUST treat them as missing. When TimestampMs is absent, the record time is `timestamp`, to the whole second.
 - **Stroke rate** is carried by the native `cadence` and `cadence256` fields (§4), not by a developer field. Producers MUST NOT write native `fractional_cadence`: common platforms ignore it, and `cadence256` carries the same information.
 
 **StrokeState values:**

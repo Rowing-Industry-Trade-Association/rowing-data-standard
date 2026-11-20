@@ -38,12 +38,12 @@ because files carrying it already exist.
 | 90–92 | In-stroke axis metadata | Assigned |
 | 93 | Extended standard fields | **Available** |
 | 94–95 | `SlipThreshold`, `WashThreshold` (`session`-level) | Assigned |
-| 96 | `StrokeState` | Assigned |
-| 97–199 | Extended standard fields | **Available** |
+| 96–97 | `StrokeState`, `TimestampMs` | Assigned |
+| 98–199 | Extended standard fields | **Available** |
 | 200–211 | Dual oarlock, per side | Assigned |
 | 212–254 | Future extensions | **Reserved** |
 
-Free capacity today: **104 fields** in 93 and 97–199, plus 43 reserved in 212–254, plus
+Free capacity today: **103 fields** in 93 and 98–199, plus 43 reserved in 212–254, plus
 69 reserved for future curve data in 20–59 and 61–89.
 
 ## Assigned fields
@@ -69,6 +69,7 @@ Free capacity today: **104 fields** in 93 and 97–199, plus 43 reserved in 212�
 | 8 | `AverageBoatSpeed` | UINT16 | 100 | m/s | Averaged over the stroke |
 | 19 | `StrokeWork` | UINT16 | 1 | J | Full stroke cycle, not drive-only |
 | 96 | `StrokeState` | UINT8 | 1 | — | `0` Unknown, `1` Waiting, `2` Drive, `3` Dwell, `4` Recovery. Only with `RecordingStrategy` TimeSampled |
+| 97 | `TimestampMs` | UINT16 | 1 | ms | Milliseconds past the whole second in native `timestamp`. 0–999; truncated, never rounded up into the next second |
 
 ### Record message — oarlock metrics (single / summary)
 
@@ -152,7 +153,7 @@ carry the data an unaware consumer will read.
 
 | FIT field | Carries | Notes |
 |---|---|---|
-| `timestamp` | Record time | Garmin epoch, from 1989-12-31 UTC |
+| `timestamp` | Record time | Garmin epoch, from 1989-12-31 UTC. Whole seconds; the milliseconds go in `TimestampMs` (97) |
 | `distance` | Cumulative distance | m, scale 100 |
 | `cadence` | Stroke rate, integer spm | Rounded, not truncated. Always write for consumers that do not read `cadence256` |
 | `cadence256` | Stroke rate, fractional spm | Scale 256 (1/256 spm) |

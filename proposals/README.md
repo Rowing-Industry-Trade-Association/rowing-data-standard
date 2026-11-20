@@ -70,3 +70,4 @@ from re-proposing the same thing, and record why.
 | # | Title | Status |
 |---|---|---|
 | 0001 | [Remove WorkoutState](0001-remove-workout-state.md) | draft |
+| 0002 | [Millisecond record timestamps](0002-millisecond-record-timestamps.md) | draft |
