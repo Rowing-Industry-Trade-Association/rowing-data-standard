@@ -88,6 +88,7 @@ Different device types generate FIT Record messages at different frequencies. Co
 **Characteristics:**
 - Each Record represents a complete stroke
 - Stroke-specific metrics (drive time, force, angles) describe that specific stroke
+- A producer MUST measure all stroke metrics over the same stroke cycle, catch to catch or finish to finish (Appendix A), and not mix the two
 - GPS position MAY be interpolated or repeated across strokes
 - REQUIRED when in-stroke curve data is present
 
@@ -178,7 +179,7 @@ Producers SHOULD use these native FIT fields for rowing data:
 | cadence | UINT8 | Stroke rate (integer spm) | Strokes per minute, **rounded** to the nearest integer (not truncated); MUST be written when rate is known, for consumers that do not read `cadence256` |
 | cadence256 | UINT16 | Stroke rate (fractional spm) | Strokes per minute, scale 256 (1/256 spm); SHOULD be written when fractional rate is known |
 | heart_rate | UINT8 | Heart rate | Beats per minute, 0-255 |
-| power | UINT16 | Average power | Watts, 0-65535 |
+| power | UINT16 | Average power over the stroke cycle | Watts, 0-65535. See notes |
 | enhanced_speed | UINT32 | Boat speed | Meters per second (scale 1000) |
 | position_lat | SINT32 | Latitude | Semicircles |
 | position_long | SINT32 | Longitude | Semicircles |
@@ -188,7 +189,8 @@ Producers SHOULD use these native FIT fields for rowing data:
 **Notes:**
 
 - **heart_rate**: Heart rate is written in the native `heart_rate` field on the same Record messages as the rowing data, whether it comes from the rowing device or from a separate sensor. It is not repeated as a developer field. When no heart rate sensor is connected, producers SHOULD omit the field rather than write 0. Session and Lap averages and maxima go in the native `avg_heart_rate` and `max_heart_rate` fields.
-- **cycle_length16**: The distance the boat (or, on an ergometer, the virtual boat) travels during one stroke cycle, catch to catch. It is not the cumulative distance travelled, which is `distance`, and not the travel of the handle, which is DriveLength (§5.1).
+- **power**: The average power over one stroke cycle (Appendix A): catch to catch, the drive and the recovery that follows it, or finish to finish, the recovery and the drive that follows it. Producers SHOULD average over this whole cycle, not over the drive alone, and MUST use the same cycle as for their other stroke metrics (§2.2). How the power is determined, from work at the handle or from a flywheel or boat-speed model, is up to the producer.
+- **cycle_length16**: The distance the boat (or, on an ergometer, the virtual boat) travels during one stroke cycle (Appendix A). It is not the cumulative distance travelled, which is `distance`, and not the travel of the handle, which is DriveLength (§5.1).
 
 ### 4.1 Sessions, Laps and Intervals
 
@@ -409,7 +411,7 @@ Which IDs are assigned, reserved or available is listed in the [field ID registr
 
 ## Appendix A: Terminology
 
-**Stroke Cycle:** Complete rowing motion from catch through drive and recovery back to catch.
+**Stroke Cycle:** Complete rowing motion, either from catch through drive and recovery back to catch (catch to catch), or from finish through recovery and drive back to finish (finish to finish). Both cover the same work, shifted by one phase. A producer picks one and uses it for all its stroke metrics (§2.2).
 
 **Drive Phase:** Portion of stroke where power is applied (handle moving toward finish).
 
